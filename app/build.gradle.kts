@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -40,7 +42,19 @@ android {
 }
 
 dependencies {
+    //coil
+    implementation(libs.coil.compose)
+    //ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
+    // Koin (Dependency Injection)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.accompanist.permissions)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -49,6 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
