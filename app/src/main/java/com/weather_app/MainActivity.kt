@@ -1,15 +1,18 @@
 package com.weather_app
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -17,45 +20,98 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.weather_app.ui.theme.LocalGradientTheme
-import com.weather_app.ui.theme.Weather_appTheme
+import androidx.core.content.ContextCompat
+import com.weather_app.android.theme.LocalGradientTheme
+import com.weather_app.android.theme.Weather_appTheme
+import com.weather_app.ui.screens.WeatherScreen
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+
+    private var permissionsGranted by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            permissionsGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        }
+
+        checkAndRequestPermissions()
+
         setContent {
-            Weather_appTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            var isDayTime by rememberSaveable { mutableStateOf(true) }
+
+            Weather_appTheme(!isDayTime) {
+                Scaffold { innerPadding ->
                     GradientBackground {
-                        Greeting(
-                            name = "John",
-                            res = R.drawable.clear_sky,
-                            paddingValues = innerPadding
-                        )
+                        if (permissionsGranted) {
+                            WeatherScreen(
+                                paddingValues = innerPadding,
+                                onDayNightDetermined = { isDay ->
+                                    isDayTime = isDay
+                                }
+                            )
+                        } else {
+                            PermissionRequestUI {
+                                requestPermissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
+
+    private fun checkAndRequestPermissions() {
+        val fineLocationPermission = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val coarseLocationPermission = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        permissionsGranted = fineLocationPermission == PackageManager.PERMISSION_GRANTED ||
+                coarseLocationPermission == PackageManager.PERMISSION_GRANTED
+
+        if (!permissionsGranted) {
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier, @DrawableRes res: Int,paddingValues: PaddingValues) {
-    Column(modifier = modifier.padding(paddingValues)) {
-        Text(text = "Hello $name!")
+fun PermissionRequestUI(onRequestPermission: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(text = "Location permissions are required to fetch weather data.")
         Spacer(modifier = Modifier.height(8.dp))
-        Image(
-            painter = painterResource(id = res),
-            contentDescription = "Greeting image",
-            contentScale = ContentScale.Fit
-        )
+        androidx.compose.material3.Button(onClick = onRequestPermission) {
+            Text("Grant Permissions")
+        }
     }
 }
+
 @Composable
 fun GradientBackground(content: @Composable () -> Unit) {
     val gradient = LocalGradientTheme.current.backgroundGradient

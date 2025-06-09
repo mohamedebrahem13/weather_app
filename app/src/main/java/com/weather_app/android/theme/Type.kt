@@ -1,4 +1,4 @@
-package com.weather_app.ui.theme
+package com.weather_app.android.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -20,6 +20,17 @@ val Typography = Typography(
     bodySmall = TextStyle(
         fontFamily = Urbanist,
         fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
+    ),
+    // Regular 16sp ✅ Replacing bodyLarge
+    bodyLarge = TextStyle(
+        fontFamily = Urbanist,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = Urbanist,
+        fontWeight = FontWeight.Medium,
         fontSize = 14.sp
     ),
 

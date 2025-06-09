@@ -1,4 +1,4 @@
-package com.weather_app.ui.theme
+package com.weather_app.android.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -14,13 +14,23 @@ val LightColorScheme = lightColorScheme(
     background = Color.White,
     primary = LightBlue,
     onBackground = DarkNavy,
+    onSurface = DarkGrayColor,
+    onSecondary = TextWhite87,
+    onTertiary = PureWhite
+
 )
 
 val DarkColorScheme = darkColorScheme(
     background = DarkNavy,
     primary = DarkPurple,
     onBackground = PureWhite,
+    onSurface = PureWhite,
+    onSecondary = DarkPurple60,
+    onTertiary = DarkNavy
+
+
 )
+
 @Composable
 fun Weather_appTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -43,7 +53,7 @@ fun Weather_appTheme(
             )
         }
     )
-
+    SetStatusBarColor()
     CompositionLocalProvider(LocalGradientTheme provides gradientTheme) {
         MaterialTheme(
             colorScheme = colorScheme,
