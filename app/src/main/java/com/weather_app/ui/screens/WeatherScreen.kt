@@ -32,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
@@ -61,7 +63,6 @@ fun WeatherScreen(
             onDayNightDetermined(current.isDay)
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -102,7 +103,7 @@ fun WeatherScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "No data available")
+                    Text(text = stringResource(R.string.no_data_available))
                 }
             }
         }
@@ -125,7 +126,6 @@ fun WeatherContent(
                 city = city
             )
         }
-
         item {
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -142,10 +142,10 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.fast_wind,
                         value = "${currentWeather.windSpeed} KM/h",
-                        label = "Wind",
+                        label = stringResource(R.string.wind),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
@@ -153,10 +153,10 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.humidity,
                         value = "${currentWeather.humidity}%",
-                        label = "Humidity",
+                        label = stringResource(R.string.humidity),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
@@ -164,15 +164,14 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.rain,
                         value = "${currentWeather.rain} mm",
-                        label = "Rain",
+                        label = stringResource(R.string.rain),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
                 }
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -180,10 +179,10 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.uv_02,
                         value = "${hourlyWeather.hourly.uvIndex[0]}",
-                        label = "UV Index",
+                        label = stringResource(R.string.uv_index),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
@@ -191,10 +190,10 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.arrow_down_05,
                         value = "${currentWeather.surfacePressure} hPa",
-                        label = "Pressure",
+                        label = stringResource(R.string.pressure),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
@@ -202,10 +201,10 @@ fun WeatherContent(
                     WeatherMetricCard(
                         iconRes = R.drawable.temperature,
                         value = "${currentWeather.apparentTemperature}°C",
-                        label = "Feels Like",
+                        label = stringResource(R.string.feels_like),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        labelTextColor =  MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        labelTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         backgroundColor = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
                     )
@@ -214,18 +213,18 @@ fun WeatherContent(
         }
         item {
             Text(
-                text = "Today",
+                text = stringResource(R.string.today),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(top = 24.dp, start = 12.dp)
             )
         }
 
-        item { HourlyWeatherRow(hourlyWeather = hourlyWeather,currentWeather.isDay) }
+        item { HourlyWeatherRow(hourlyWeather = hourlyWeather, currentWeather.isDay) }
 
         item {
             Text(
-                text = "Next 7 Days",
+                text = stringResource(R.string.next_7_days),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(top = 24.dp, start = 12.dp)
@@ -234,14 +233,14 @@ fun WeatherContent(
 
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            WeeklyForecastCard(dailyWeather = dailyWeather, isDay = currentWeather.isDay)
+            WeeklyForecastCard(dailyWeather = dailyWeather)
         }
     }
 }
 
 @Composable
 fun CollapsingWeatherHeader(
-     isDay: Boolean,
+    isDay: Boolean,
     hourlyWeather: HourlyWeather,
     city: String
 ) {
@@ -250,7 +249,7 @@ fun CollapsingWeatherHeader(
 
     val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
     val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
-    val weatherIcon = getWeatherIcon(weatherCode,isDay)
+    val weatherIcon = getWeatherIcon(weatherCode, isDay)
 
     Column(
         modifier = Modifier
@@ -268,7 +267,7 @@ fun CollapsingWeatherHeader(
         ) {
             Icon(
                 painter = painterResource(R.drawable.location_05),
-                contentDescription = "Location Icon",
+                contentDescription = stringResource(R.string.location_icon),
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -282,7 +281,7 @@ fun CollapsingWeatherHeader(
 
         Image(
             painter = painterResource(weatherIcon),
-            contentDescription = "Weather Icon",
+            contentDescription = stringResource(R.string.weather_icon),
             modifier = Modifier.size(DpSize(220.dp, 200.dp)),
             contentScale = ContentScale.Crop
         )
@@ -319,7 +318,7 @@ fun CollapsingWeatherHeader(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_up_04),
-                    contentDescription = "High Temperature",
+                    contentDescription = stringResource(R.string.high_temperature),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.onBackground
 
@@ -329,8 +328,8 @@ fun CollapsingWeatherHeader(
 
                 Text(
                     text = "$maxTemperature°C",
-                    style = MaterialTheme.typography.bodyMedium
-                    ,color = MaterialTheme.colorScheme.onBackground
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -347,7 +346,7 @@ fun CollapsingWeatherHeader(
 
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_down_04),
-                    contentDescription = "Low Temperature",
+                    contentDescription = stringResource(R.string.low_temperature),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.onBackground
 
@@ -366,14 +365,18 @@ fun CollapsingWeatherHeader(
 }
 
 @Composable
-fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse, isDay: Boolean) {
+fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .padding(bottom = 32.dp)
             .clip(RoundedCornerShape(24.dp))
-            .border(1.dp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f), RoundedCornerShape(24.dp))
+            .border(
+                1.dp,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
+                RoundedCornerShape(24.dp)
+            )
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
     ) {
         dailyWeather.daily.time.take(7).forEachIndexed { index, date ->
@@ -392,11 +395,12 @@ fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse, isDay: Boolean) {
                 )
 
                 Image(
-                    painter = painterResource(getWeatherIcon(dailyWeather.daily.weatherCode[index],isDay)),
-                    contentDescription = "Weather Icon",
+                    painter = painterResource(getDayWeatherIcon(dailyWeather.daily.weatherCode[index])),
+                    contentDescription = stringResource(R.string.weather_icon),
                     modifier = Modifier
                         .size(91.dp, 45.dp)
-                        .padding(end = 9.5.dp)
+                        .padding(end = 9.5.dp, bottom = 8.dp, top = 8.dp)
+
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -404,7 +408,7 @@ fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse, isDay: Boolean) {
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_up_04),
-                        contentDescription = "High Temperature",
+                        contentDescription = stringResource(R.string.high_temperature),
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
 
@@ -463,7 +467,7 @@ fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse, isDay: Boolean) {
 }
 
 @Composable
-fun HourlyWeatherRow(hourlyWeather: HourlyWeather,isDay: Boolean) {
+fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean) {
     val times = hourlyWeather.hourly.time
     val temps = hourlyWeather.hourly.temperature2m
     val weatherCodes = hourlyWeather.hourly.weatherCode
@@ -493,9 +497,12 @@ fun HourlyWeatherRow(hourlyWeather: HourlyWeather,isDay: Boolean) {
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .border(1.dp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
-                            , RoundedCornerShape(20.dp))
-                        .background( MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
+                        .border(
+                            1.dp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
+                            RoundedCornerShape(20.dp)
+                        )
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -517,7 +524,7 @@ fun HourlyWeatherRow(hourlyWeather: HourlyWeather,isDay: Boolean) {
                     )
                 }
                 Image(
-                    painter = painterResource(getWeatherIcon(weatherCode, isDay =isDay )),
+                    painter = painterResource(getWeatherIcon(weatherCode, isDay = isDay)),
                     contentDescription = "Weather Icon",
                     modifier = Modifier
                         .size(width = 63.99.dp, height = 58.dp)
@@ -535,32 +542,35 @@ fun getDayName(date: String): String {
     return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
 }
 
+@Composable
 fun getWeatherCondition(weatherCode: Int): String {
+    val context = LocalContext.current
+
     return when (weatherCode) {
-        0 -> "Clear Sky"
-        1 -> "Mainly Clear"
-        2 -> "Partly Cloudy"
-        3 -> "Overcast"
-        45 -> "Fog"
-        48 -> "Depositing Rime Fog"
-        51 -> "Light Drizzle"
-        53 -> "Moderate Drizzle"
-        55 -> "Dense Drizzle"
-        61 -> "Light Rain"
-        63 -> "Moderate Rain"
-        65 -> "Heavy Rain"
-        71 -> "Light Snowfall"
-        73 -> "Moderate Snowfall"
-        75 -> "Heavy Snowfall"
-        80 -> "Rain Showers (Slight)"
-        81 -> "Rain Showers (Moderate)"
-        82 -> "Rain Showers (Heavy)"
-        85 -> "Snow Showers (Slight)"
-        86 -> "Snow Showers (Heavy)"
-        95 -> "Thunderstorms (Slight)"
-        96 -> "Thunderstorms (Moderate)"
-        99 -> "Thunderstorms with Hail"
-        else -> "Weather Not Recognized"
+        0 -> context.getString(R.string.clear_sky)
+        1 -> stringResource(R.string.mainly_clear)
+        2 -> stringResource(R.string.partly_cloudy)
+        3 -> stringResource(R.string.overcast)
+        45 -> stringResource(R.string.fog)
+        48 -> stringResource(R.string.depositing_rime_fog)
+        51 -> stringResource(R.string.light_drizzle)
+        53 -> stringResource(R.string.moderate_drizzle)
+        55 -> stringResource(R.string.dense_drizzle)
+        61 -> stringResource(R.string.light_rain)
+        63 -> stringResource(R.string.moderate_rain)
+        65 -> stringResource(R.string.heavy_rain)
+        71 -> stringResource(R.string.light_snowfall)
+        73 -> stringResource(R.string.moderate_snowfall)
+        75 -> stringResource(R.string.heavy_snowfall)
+        80 -> stringResource(R.string.rain_showers_slight)
+        81 -> stringResource(R.string.rain_showers_moderate)
+        82 -> stringResource(R.string.rain_showers_heavy)
+        85 -> stringResource(R.string.snow_showers_slight)
+        86 -> stringResource(R.string.snow_showers_heavy)
+        95 -> stringResource(R.string.thunderstorms_slight)
+        96 -> stringResource(R.string.thunderstorms_moderate)
+        99 -> stringResource(R.string.thunderstorms_with_hail)
+        else -> stringResource(R.string.weather_not_recognized)
     }
 }
 
@@ -622,5 +632,35 @@ fun getWeatherIcon(weatherCode: Int, isDay: Boolean): Int {
     } else {
         nightWeatherIcons.getOrElse(weatherCode) { R.drawable.clear_sky_night }
     }
+}
+
+fun getDayWeatherIcon(weatherCode: Int): Int {
+    val dayWeatherIcons = mapOf(
+        0 to R.drawable.clear_sky,
+        1 to R.drawable.mainly_clear,
+        2 to R.drawable.partly_cloudy,
+        3 to R.drawable.overcast,
+        45 to R.drawable.fog,
+        48 to R.drawable.depositing_rime_fog,
+        51 to R.drawable.drizzle_light,
+        53 to R.drawable.drizzle_moderate,
+        55 to R.drawable.drizzle_intensity,
+        61 to R.drawable.rain_slight,
+        63 to R.drawable.rain_moderate,
+        65 to R.drawable.rain_intensity,
+        71 to R.drawable.snow_fall_light,
+        73 to R.drawable.snow_fall_moderate,
+        75 to R.drawable.snow_fall_intensity,
+        80 to R.drawable.snow_shower_slight,
+        81 to R.drawable.rain_shower_moderate,
+        82 to R.drawable.rain_shower_violent,
+        85 to R.drawable.rain_shower_slight,
+        86 to R.drawable.snow_shower_heavy,
+        95 to R.drawable.thunder_storm_slight_or_moderate,
+        96 to R.drawable.thunder_storm_with_slight_hail,
+        99 to R.drawable.thunder_storm_with_heavy_hail
+    )
+
+    return dayWeatherIcons.getOrElse(weatherCode) { R.drawable.clear_sky }
 }
 
