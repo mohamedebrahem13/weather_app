@@ -63,7 +63,7 @@ fun WeatherScreen(
 
             uiState.value.errorMessage.isNotEmpty() -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "Error: ${uiState.value.errorMessage}")
