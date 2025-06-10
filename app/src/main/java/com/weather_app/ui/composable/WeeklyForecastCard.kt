@@ -67,7 +67,6 @@ fun WeeklyForecastCard(
                     modifier = Modifier
                         .size(91.dp, 45.dp)
                         .padding(end = 9.5.dp, bottom = 8.dp, top = 8.dp)
-
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
