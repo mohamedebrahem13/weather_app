@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -42,7 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -340,8 +341,12 @@ fun CollapsingWeatherContent(
                 Image(
                     painter = painterResource(weatherIcon),
                     contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier.size(iconWidth, iconHeight),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier
+                        .size(iconWidth, iconHeight)
+                        .shadow(50.dp, shape = CircleShape)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
+
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 WeatherTextBlock(
@@ -362,8 +367,12 @@ fun CollapsingWeatherContent(
                 Image(
                     painter = painterResource(weatherIcon),
                     contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier.size(iconWidth, iconHeight),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier
+                        .size(iconWidth, iconHeight)
+                        .shadow(50.dp, shape = CircleShape)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
+
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 WeatherTextBlock(
