@@ -1,15 +1,5 @@
 package com.weather_app.ui.screens
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,19 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,23 +23,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import com.weather_app.R
 import com.weather_app.android.theme.LightBlue
 import com.weather_app.domain.models.CurrentWeather
 import com.weather_app.domain.models.DailyWeatherResponse
 import com.weather_app.domain.models.HourlyWeather
+import com.weather_app.ui.composable.HourlyWeatherRow
+import com.weather_app.ui.composable.WeatherHeaderContainer
 import com.weather_app.ui.composable.WeatherMetricCard
+import com.weather_app.ui.composable.WeeklyForecastCard
 import com.weather_app.ui.viewmodel.WeatherViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -256,388 +235,7 @@ fun WeatherContent(
         }
     }
 }
-@Composable
-fun WeatherHeaderContainer(
-    isDay: Boolean,
-    hourlyWeather: HourlyWeather,
-    city: String,
-    scrollOffset: Float
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 12.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.location_05),
-                contentDescription = stringResource(R.string.location_icon),
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                color = MaterialTheme.colorScheme.onSurface,
-                text = city,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
 
-        CollapsingWeatherContent(
-            isDay = isDay,
-            hourlyWeather = hourlyWeather,
-            scrollOffset = scrollOffset
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun CollapsingWeatherContent(
-    isDay: Boolean,
-    hourlyWeather: HourlyWeather,
-    scrollOffset: Float
-) {
-    val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
-    val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
-
-    val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
-    val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
-    val weatherIcon = getWeatherIcon(weatherCode, isDay)
-    val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
-    val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
-
-    val clampedOffset = scrollOffset.coerceIn(0f, 1f)
-
-    val iconWidth by animateDpAsState(
-        targetValue = lerp(220.dp, 124.dp, clampedOffset),
-        animationSpec = tween(durationMillis = 400),
-        label = "Animated Icon Width"
-    )
-    val iconHeight by animateDpAsState(
-        targetValue = lerp(200.dp, 112.dp, clampedOffset),
-        animationSpec = tween(durationMillis = 400),
-        label = "Animated Icon Height"
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    AnimatedContent(
-        targetState = clampedOffset < 0.1f,
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "CollapseSwitch"
-    ) { isExpanded ->
-        if (isExpanded) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(weatherIcon),
-                    contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier
-                        .size(iconWidth, iconHeight)
-                        .shadow(50.dp, shape = CircleShape)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
-
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                WeatherTextBlock(
-                    temperature = temperature.toString(),
-                    weatherCode = weatherCode,
-                    maxTemperature = maxTemperature,
-                    minTemperature = minTemperature
-                )
-            }
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    painter = painterResource(weatherIcon),
-                    contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier
-                        .size(iconWidth, iconHeight)
-                        .shadow(50.dp, shape = CircleShape)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
-
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                WeatherTextBlock(
-                    temperature = temperature.toString(),
-                    weatherCode = weatherCode,
-                    maxTemperature = maxTemperature,
-                    minTemperature = minTemperature,
-                    alignStart = false
-                )
-            }
-        }
-    }
-}
-@Composable
-private fun WeatherTextBlock(
-    temperature: String,
-    weatherCode: Int,
-    maxTemperature: String,
-    minTemperature: String,
-    alignStart: Boolean = false
-) {
-    Column(
-        horizontalAlignment = if (alignStart) Alignment.Start else Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "$temperature°C",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Text(
-            text = getWeatherCondition(weatherCode),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Box(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
-                    shape = RoundedCornerShape(100.dp)
-                )
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_up_04),
-                    contentDescription = stringResource(R.string.high_temperature),
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = "$maxTemperature°C",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f))
-                        .width(1.dp)
-                        .height(14.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_down_04),
-                    contentDescription = stringResource(R.string.low_temperature),
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.width(4.dp))
-
-                Text(
-                    text = "$minTemperature°C",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-@Composable
-fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(bottom = 32.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .border(
-                1.dp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
-                RoundedCornerShape(24.dp)
-            )
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
-    ) {
-        dailyWeather.daily.time.take(7).forEachIndexed { index, date ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .padding(top = 22.dp, bottom = 21.dp, end = 9.5.dp, start = 16.dp),
-                    text = getDayName(date),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                )
-
-                Image(
-                    painter = painterResource(getDayWeatherIcon(dailyWeather.daily.weatherCode[index])),
-                    contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier
-                        .size(91.dp, 45.dp)
-                        .padding(end = 9.5.dp, bottom = 8.dp, top = 8.dp)
-
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_up_04),
-                        contentDescription = stringResource(R.string.high_temperature),
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
-
-                    )
-
-                    Spacer(modifier = Modifier.width(2.5.dp))
-
-
-                    Text(
-                        text = "${dailyWeather.daily.temperature2mMax[index]}°C",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f))
-                            .width(1.dp)
-                            .height(14.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_down_04),
-                        contentDescription = "Low Temperature",
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = "${dailyWeather.daily.temperature2mMin[index]}°C",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
-                        modifier = Modifier.padding(end = 12.dp)
-
-                    )
-                }
-
-            }
-
-            if (index < 6) {
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean) {
-    val times = hourlyWeather.hourly.time
-    val temps = hourlyWeather.hourly.temperature2m
-    val weatherCodes = hourlyWeather.hourly.weatherCode
-
-    val today = LocalDate.now()
-    DateTimeFormatter.ISO_LOCAL_DATE
-
-    val filteredData = times.mapIndexedNotNull { index, timeStr ->
-        val dateTime = LocalDateTime.parse(timeStr)
-        if (dateTime.toLocalDate() == today) {
-            Triple(dateTime, temps[index], weatherCodes[index])
-        } else {
-            null
-        }
-    }
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp)
-    ) {
-        items(filteredData.size) { index ->
-            val (dateTime, temp, weatherCode) = filteredData[index]
-            Box(modifier = Modifier.wrapContentSize()) {
-                Column(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .border(
-                            1.dp,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
-                            RoundedCornerShape(20.dp)
-                        )
-                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 62.dp,
-                            bottom = 8.dp,
-                            start = 26.dp,
-                            end = 25.dp
-                        ),
-                        text = "$temp°C",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
-                    )
-                    Text(
-                        modifier = Modifier.padding(bottom = 20.dp),
-                        text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                    )
-                }
-                Image(
-                    painter = painterResource(getWeatherIcon(weatherCode, isDay = isDay)),
-                    contentDescription = "Weather Icon",
-                    modifier = Modifier
-                        .size(width = 63.99.dp, height = 58.dp)
-                        .align(Alignment.TopCenter)
-                        .offset(y = (-12).dp)
-                )
-            }
-        }
-    }
-}
 
 fun getDayName(date: String): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
