@@ -11,6 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 class WeatherViewModel(
     private val getHourlyWeatherUseCase: GetHourlyWeatherUseCase,
@@ -23,6 +27,11 @@ class WeatherViewModel(
 
     init {
         fetchWeatherData()
+    }
+    fun getDayName(date: String): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val localDate = LocalDate.parse(date, formatter)
+        return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
     }
 
     private fun fetchWeatherData() {

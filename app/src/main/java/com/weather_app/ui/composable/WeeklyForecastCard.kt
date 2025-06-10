@@ -27,11 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
 import com.weather_app.domain.models.DailyWeatherResponse
-import com.weather_app.ui.screens.getDayName
 import com.weather_app.ui.screens.getDayWeatherIcon
+import com.weather_app.ui.viewmodel.WeatherViewModel
 
 @Composable
-fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse) {
+fun WeeklyForecastCard(
+    dailyWeather: DailyWeatherResponse, viewModel: WeatherViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,7 +57,7 @@ fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse) {
                     modifier = Modifier
                         .width(120.dp)
                         .padding(top = 22.dp, bottom = 21.dp, end = 9.5.dp, start = 16.dp),
-                    text = getDayName(date),
+                    text = viewModel.getDayName(date),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )

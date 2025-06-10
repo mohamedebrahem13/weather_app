@@ -37,10 +37,7 @@ import com.weather_app.ui.composable.WeatherMetricCard
 import com.weather_app.ui.composable.WeeklyForecastCard
 import com.weather_app.ui.viewmodel.WeatherViewModel
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import java.util.Locale
+
 
 @Composable
 fun WeatherScreen(
@@ -85,6 +82,7 @@ fun WeatherScreen(
                         city = uiState.value.city,
                         dailyWeather = uiState.value.dailyWeather!!,
                         currentWeather = uiState.value.currentWeather!!,
+                        viewModel = viewModel
                     )
                 }
             }
@@ -107,8 +105,8 @@ fun WeatherContent(
     currentWeather: CurrentWeather,
     city: String,
     dailyWeather: DailyWeatherResponse,
-
-    ) {
+    viewModel: WeatherViewModel
+) {
     val scrollState = rememberLazyListState()
     val scrollOffset by remember {
         derivedStateOf {
@@ -231,16 +229,9 @@ fun WeatherContent(
 
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            WeeklyForecastCard(dailyWeather = dailyWeather)
+            WeeklyForecastCard(viewModel = viewModel, dailyWeather = dailyWeather)
         }
     }
-}
-
-
-fun getDayName(date: String): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val localDate = LocalDate.parse(date, formatter)
-    return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
 }
 
 @Composable
