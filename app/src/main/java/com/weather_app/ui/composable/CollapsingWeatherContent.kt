@@ -87,7 +87,7 @@ fun CollapsingWeatherContent(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(iconWidth + 20.dp, iconHeight + 20.dp) // Slightly larger than the icon
+                            .size(iconWidth + 20.dp, iconHeight + 20.dp)
                             .shadow(100.dp, shape = CircleShape)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
@@ -117,16 +117,24 @@ fun CollapsingWeatherContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = painterResource(weatherIcon),
-                    contentDescription = stringResource(R.string.weather_icon),
-                    modifier = Modifier
-                        .size(iconWidth, iconHeight)
-                        .shadow(50.dp, shape = CircleShape)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(iconWidth + 20.dp, iconHeight + 20.dp)
+                            .shadow(100.dp, shape = CircleShape)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.01f))
+                    )
 
-                )
+                    Image(
+                        painter = painterResource(weatherIcon),
+                        contentDescription = stringResource(R.string.weather_icon),
+                        modifier = Modifier
+                            .size(iconWidth, iconHeight)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 WeatherTextBlock(
                     temperature = temperature.toString(),
