@@ -1,5 +1,12 @@
 package com.weather_app.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -28,6 +36,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +46,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.weather_app.R
 import com.weather_app.android.theme.LightBlue
 import com.weather_app.domain.models.CurrentWeather
@@ -118,12 +129,19 @@ fun WeatherContent(
     dailyWeather: DailyWeatherResponse,
 
     ) {
-    LazyColumn {
+    val scrollState = rememberLazyListState()
+    val scrollOffset by remember {
+        derivedStateOf {
+            minOf(1f, scrollState.firstVisibleItemScrollOffset / 300f)
+        }
+    }
+    LazyColumn(state = scrollState) {
         item {
-            CollapsingWeatherHeader(
+            WeatherHeaderContainer(
                 currentWeather.isDay,
                 hourlyWeather = hourlyWeather,
-                city = city
+                city = city,
+                scrollOffset
             )
         }
         item {
@@ -163,7 +181,7 @@ fun WeatherContent(
 
                     WeatherMetricCard(
                         iconRes = R.drawable.rain,
-                        value = "${currentWeather.rain} mm",
+                        value = "${currentWeather.rain}%",
                         label = stringResource(R.string.rain),
                         iconTint = LightBlue,
                         valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -237,26 +255,17 @@ fun WeatherContent(
         }
     }
 }
-
 @Composable
-fun CollapsingWeatherHeader(
+fun WeatherHeaderContainer(
     isDay: Boolean,
     hourlyWeather: HourlyWeather,
-    city: String
+    city: String,
+    scrollOffset: Float
 ) {
-    val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
-    val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
-
-    val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
-    val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
-    val weatherIcon = getWeatherIcon(weatherCode, isDay)
-
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -279,15 +288,106 @@ fun CollapsingWeatherHeader(
             )
         }
 
-        Image(
-            painter = painterResource(weatherIcon),
-            contentDescription = stringResource(R.string.weather_icon),
-            modifier = Modifier.size(DpSize(220.dp, 200.dp)),
-            contentScale = ContentScale.Crop
+        CollapsingWeatherContent(
+            isDay = isDay,
+            hourlyWeather = hourlyWeather,
+            scrollOffset = scrollOffset
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(8.dp))
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun CollapsingWeatherContent(
+    isDay: Boolean,
+    hourlyWeather: HourlyWeather,
+    scrollOffset: Float
+) {
+    val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
+    val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
 
+    val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
+    val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
+    val weatherIcon = getWeatherIcon(weatherCode, isDay)
+    val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
+    val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
+
+    val clampedOffset = scrollOffset.coerceIn(0f, 1f)
+
+    val iconWidth by animateDpAsState(
+        targetValue = lerp(220.dp, 124.dp, clampedOffset),
+        animationSpec = tween(durationMillis = 400),
+        label = "Animated Icon Width"
+    )
+    val iconHeight by animateDpAsState(
+        targetValue = lerp(200.dp, 112.dp, clampedOffset),
+        animationSpec = tween(durationMillis = 400),
+        label = "Animated Icon Height"
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    AnimatedContent(
+        targetState = clampedOffset < 0.1f,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        label = "CollapseSwitch"
+    ) { isExpanded ->
+        if (isExpanded) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(weatherIcon),
+                    contentDescription = stringResource(R.string.weather_icon),
+                    modifier = Modifier.size(iconWidth, iconHeight),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                WeatherTextBlock(
+                    temperature = temperature.toString(),
+                    weatherCode = weatherCode,
+                    maxTemperature = maxTemperature,
+                    minTemperature = minTemperature
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Image(
+                    painter = painterResource(weatherIcon),
+                    contentDescription = stringResource(R.string.weather_icon),
+                    modifier = Modifier.size(iconWidth, iconHeight),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                WeatherTextBlock(
+                    temperature = temperature.toString(),
+                    weatherCode = weatherCode,
+                    maxTemperature = maxTemperature,
+                    minTemperature = minTemperature,
+                    alignStart = false
+                )
+            }
+        }
+    }
+}
+@Composable
+private fun WeatherTextBlock(
+    temperature: String,
+    weatherCode: Int,
+    maxTemperature: String,
+    minTemperature: String,
+    alignStart: Boolean = false
+) {
+    Column(
+        horizontalAlignment = if (alignStart) Alignment.Start else Alignment.CenterHorizontally
+    ) {
         Text(
             text = "$temperature°C",
             style = MaterialTheme.typography.displayLarge,
@@ -298,11 +398,8 @@ fun CollapsingWeatherHeader(
             text = getWeatherCondition(weatherCode),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-
-        val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
-        val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
 
         Box(
             modifier = Modifier
@@ -314,14 +411,13 @@ fun CollapsingWeatherHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, start = 24.dp, end = 24.dp)
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_up_04),
                     contentDescription = stringResource(R.string.high_temperature),
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -329,7 +425,7 @@ fun CollapsingWeatherHeader(
                 Text(
                     text = "$maxTemperature°C",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -348,8 +444,7 @@ fun CollapsingWeatherHeader(
                     painter = painterResource(id = R.drawable.arrow_down_04),
                     contentDescription = stringResource(R.string.low_temperature),
                     modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))
@@ -357,13 +452,12 @@ fun CollapsingWeatherHeader(
                 Text(
                     text = "$minTemperature°C",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
-
 @Composable
 fun WeeklyForecastCard(dailyWeather: DailyWeatherResponse) {
     Column(

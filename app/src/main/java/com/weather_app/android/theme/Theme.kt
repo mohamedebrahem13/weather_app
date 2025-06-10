@@ -16,7 +16,8 @@ val LightColorScheme = lightColorScheme(
     onBackground = DarkNavy,
     onSurface = DarkGrayColor,
     onSecondary = TextWhite87,
-    onTertiary = PureWhite
+    onTertiary = PureWhite,
+    onSurfaceVariant = DarkPurple60
 
 )
 
@@ -26,7 +27,8 @@ val DarkColorScheme = darkColorScheme(
     onBackground = PureWhite,
     onSurface = PureWhite,
     onSecondary = DarkPurple60,
-    onTertiary = DarkNavy
+    onTertiary = DarkNavy,
+    onSurfaceVariant=TextWhite87
 
 
 )
