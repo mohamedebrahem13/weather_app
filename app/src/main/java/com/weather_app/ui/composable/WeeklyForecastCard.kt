@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
 import com.weather_app.domain.models.DailyWeatherResponse
-import com.weather_app.ui.screens.getDayWeatherIcon
 import com.weather_app.ui.viewmodel.WeatherViewModel
 
 @Composable
@@ -63,7 +62,7 @@ fun WeeklyForecastCard(
                 )
 
                 Image(
-                    painter = painterResource(getDayWeatherIcon(dailyWeather.daily.weatherCode[index])),
+                    painter = painterResource(viewModel.getDayWeatherIcon(dailyWeather.daily.weatherCode[index])),
                     contentDescription = stringResource(R.string.weather_icon),
                     modifier = Modifier
                         .size(91.dp, 45.dp)

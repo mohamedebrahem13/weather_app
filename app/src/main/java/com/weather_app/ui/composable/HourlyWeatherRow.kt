@@ -23,13 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.domain.models.HourlyWeather
-import com.weather_app.ui.screens.getWeatherIcon
+import com.weather_app.ui.viewmodel.WeatherViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean) {
+fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean, viewModel: WeatherViewModel) {
     val times = hourlyWeather.hourly.time
     val temps = hourlyWeather.hourly.temperature2m
     val weatherCodes = hourlyWeather.hourly.weatherCode
@@ -86,7 +86,7 @@ fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean) {
                     )
                 }
                 Image(
-                    painter = painterResource(getWeatherIcon(weatherCode, isDay = isDay)),
+                    painter = painterResource(viewModel.getWeatherIcon(weatherCode, isDay = isDay)),
                     contentDescription = "Weather Icon",
                     modifier = Modifier
                         .size(width = 63.99.dp, height = 58.dp)

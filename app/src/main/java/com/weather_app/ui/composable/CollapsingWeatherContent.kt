@@ -36,8 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.weather_app.R
 import com.weather_app.domain.models.HourlyWeather
-import com.weather_app.ui.screens.getWeatherCondition
-import com.weather_app.ui.screens.getWeatherIcon
+import com.weather_app.ui.viewmodel.WeatherViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -46,14 +45,15 @@ import java.time.format.DateTimeFormatter
 fun CollapsingWeatherContent(
     isDay: Boolean,
     hourlyWeather: HourlyWeather,
-    scrollOffset: Float
+    scrollOffset: Float,
+    viewModel: WeatherViewModel
 ) {
     val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
     val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
 
     val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
     val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
-    val weatherIcon = getWeatherIcon(weatherCode, isDay)
+    val weatherIcon = viewModel.getWeatherIcon(weatherCode, isDay)
     val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
     val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
 
@@ -97,7 +97,8 @@ fun CollapsingWeatherContent(
                     temperature = temperature.toString(),
                     weatherCode = weatherCode,
                     maxTemperature = maxTemperature,
-                    minTemperature = minTemperature
+                    minTemperature = minTemperature,
+                    viewModel=viewModel
                 )
             }
         } else {
@@ -124,7 +125,8 @@ fun CollapsingWeatherContent(
                     weatherCode = weatherCode,
                     maxTemperature = maxTemperature,
                     minTemperature = minTemperature,
-                    alignStart = false
+                    alignStart = false,
+                    viewModel=viewModel
                 )
             }
         }
@@ -137,7 +139,10 @@ private fun WeatherTextBlock(
     weatherCode: Int,
     maxTemperature: String,
     minTemperature: String,
-    alignStart: Boolean = false
+    alignStart: Boolean = false,
+    viewModel: WeatherViewModel
+
+
 ) {
     Column(
         horizontalAlignment = if (alignStart) Alignment.Start else Alignment.CenterHorizontally
@@ -149,7 +154,7 @@ private fun WeatherTextBlock(
         )
 
         Text(
-            text = getWeatherCondition(weatherCode),
+            text = viewModel.getWeatherCondition(weatherCode),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier.padding(bottom = 8.dp)

@@ -19,13 +19,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
 import com.weather_app.domain.models.HourlyWeather
+import com.weather_app.ui.viewmodel.WeatherViewModel
 
 @Composable
 fun WeatherHeaderContainer(
     isDay: Boolean,
     hourlyWeather: HourlyWeather,
     city: String,
-    scrollOffset: Float
+    scrollOffset: Float,
+    viewModel: WeatherViewModel
 ) {
     Column(
         modifier = Modifier
@@ -56,7 +58,8 @@ fun WeatherHeaderContainer(
         CollapsingWeatherContent(
             isDay = isDay,
             hourlyWeather = hourlyWeather,
-            scrollOffset = scrollOffset
+            scrollOffset = scrollOffset,
+            viewModel=viewModel
         )
     }
 }
