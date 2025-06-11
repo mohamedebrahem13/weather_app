@@ -35,28 +35,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.weather_app.R
-import com.weather_app.domain.models.HourlyWeather
-import com.weather_app.ui.viewmodel.WeatherViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CollapsingWeatherContent(
-    isDay: Boolean,
-    hourlyWeather: HourlyWeather,
+    temperature: String,
+    weatherIcon: Int,
+    maxTemperature: String,
+    minTemperature: String,
     scrollOffset: Float,
-    viewModel: WeatherViewModel
+    weatherCondition: String
 ) {
-    val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
-    val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
-
-    val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }
-    val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
-    val weatherIcon = viewModel.getWeatherIcon(weatherCode, isDay)
-    val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
-    val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
-
     val clampedOffset = scrollOffset.coerceIn(0f, 1f)
 
     val iconWidth by animateDpAsState(
@@ -82,9 +71,7 @@ fun CollapsingWeatherContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(contentAlignment = Alignment.Center) {
                     Box(
                         modifier = Modifier
                             .size(iconWidth + 20.dp, iconHeight + 20.dp)
@@ -96,17 +83,15 @@ fun CollapsingWeatherContent(
                     Image(
                         painter = painterResource(weatherIcon),
                         contentDescription = stringResource(R.string.weather_icon),
-                        modifier = Modifier
-                            .size(iconWidth, iconHeight)
+                        modifier = Modifier.size(iconWidth, iconHeight)
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 WeatherTextBlock(
-                    temperature = temperature.toString(),
-                    weatherCode = weatherCode,
+                    temperature = temperature,
                     maxTemperature = maxTemperature,
                     minTemperature = minTemperature,
-                    viewModel=viewModel
+                    condition = weatherCondition
                 )
             }
         } else {
@@ -117,9 +102,7 @@ fun CollapsingWeatherContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(contentAlignment = Alignment.Center) {
                     Box(
                         modifier = Modifier
                             .size(iconWidth + 20.dp, iconHeight + 20.dp)
@@ -131,34 +114,30 @@ fun CollapsingWeatherContent(
                     Image(
                         painter = painterResource(weatherIcon),
                         contentDescription = stringResource(R.string.weather_icon),
-                        modifier = Modifier
-                            .size(iconWidth, iconHeight)
+                        modifier = Modifier.size(iconWidth, iconHeight)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 WeatherTextBlock(
-                    temperature = temperature.toString(),
-                    weatherCode = weatherCode,
+                    temperature = temperature,
                     maxTemperature = maxTemperature,
                     minTemperature = minTemperature,
                     alignStart = false,
-                    viewModel=viewModel
+                    condition = weatherCondition
                 )
             }
         }
     }
 }
 
+
 @Composable
 private fun WeatherTextBlock(
     temperature: String,
-    weatherCode: Int,
     maxTemperature: String,
     minTemperature: String,
-    alignStart: Boolean = false,
-    viewModel: WeatherViewModel
-
-
+    condition: String,
+    alignStart: Boolean = false
 ) {
     Column(
         horizontalAlignment = if (alignStart) Alignment.Start else Alignment.CenterHorizontally
@@ -170,7 +149,7 @@ private fun WeatherTextBlock(
         )
 
         Text(
-            text = viewModel.getWeatherCondition(weatherCode),
+            text = condition,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier.padding(bottom = 8.dp)

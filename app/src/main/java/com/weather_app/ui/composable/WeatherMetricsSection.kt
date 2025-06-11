@@ -14,13 +14,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
 import com.weather_app.android.theme.LightBlue
-import com.weather_app.domain.models.CurrentWeather
-import com.weather_app.domain.models.HourlyWeather
 
 @Composable
 fun WeatherMetricsSection(
-    currentWeather: CurrentWeather,
-    hourlyWeather: HourlyWeather
+    windSpeed: Double,
+    humidity: Int,
+    rain: Double,
+    uvIndex: Double,
+    pressure: Double,
+    feelsLike: Double
 ) {
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -36,7 +38,7 @@ fun WeatherMetricsSection(
         ) {
             WeatherMetricCard(
                 iconRes = R.drawable.fast_wind,
-                value = "${currentWeather.windSpeed} KM/h",
+                value = "$windSpeed KM/h",
                 label = stringResource(R.string.wind),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -47,7 +49,7 @@ fun WeatherMetricsSection(
 
             WeatherMetricCard(
                 iconRes = R.drawable.humidity,
-                value = "${currentWeather.humidity}%",
+                value = "$humidity%",
                 label = stringResource(R.string.humidity),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -58,7 +60,7 @@ fun WeatherMetricsSection(
 
             WeatherMetricCard(
                 iconRes = R.drawable.rain,
-                value = "${currentWeather.rain}%",
+                value = "$rain%",
                 label = stringResource(R.string.rain),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -74,7 +76,7 @@ fun WeatherMetricsSection(
         ) {
             WeatherMetricCard(
                 iconRes = R.drawable.uv_02,
-                value = "${hourlyWeather.hourly.uvIndex[0]}",
+                value = "$uvIndex",
                 label = stringResource(R.string.uv_index),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -85,7 +87,7 @@ fun WeatherMetricsSection(
 
             WeatherMetricCard(
                 iconRes = R.drawable.arrow_down_05,
-                value = "${currentWeather.surfacePressure} hPa",
+                value = "$pressure hPa",
                 label = stringResource(R.string.pressure),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
@@ -96,7 +98,7 @@ fun WeatherMetricsSection(
 
             WeatherMetricCard(
                 iconRes = R.drawable.temperature,
-                value = "${currentWeather.apparentTemperature}°C",
+                value = "$feelsLike°C",
                 label = stringResource(R.string.feels_like),
                 iconTint = LightBlue,
                 valueTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),

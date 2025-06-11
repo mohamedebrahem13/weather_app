@@ -9,12 +9,14 @@ import com.weather_app.common.data.Resource
 import com.weather_app.domain.interactor.GetCurrentWeatherUseCase
 import com.weather_app.domain.interactor.GetDailyWeatherUseCase
 import com.weather_app.domain.interactor.GetHourlyWeatherUseCase
+import com.weather_app.domain.models.HourlyWeather
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -35,6 +37,25 @@ class WeatherViewModel(
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val localDate = LocalDate.parse(date, formatter)
         return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    }
+    fun getTodayHourlyUiData(hourlyWeather: HourlyWeather, isDay: Boolean): Triple<List<String>, List<String>, List<Int>> {
+        val today = LocalDate.now()
+
+        val hours = mutableListOf<String>()
+        val temps = mutableListOf<String>()
+        val icons = mutableListOf<Int>()
+
+        hourlyWeather.hourly.time.forEachIndexed { index, timeStr ->
+            val dateTime = LocalDateTime.parse(timeStr)
+            if (dateTime.toLocalDate() == today) {
+                val hour = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")) // Proper formatting here
+                hours.add(hour)
+                temps.add(hourlyWeather.hourly.temperature2m[index].toString())
+                icons.add(getWeatherIcon(hourlyWeather.hourly.weatherCode[index], isDay))
+            }
+        }
+
+        return Triple(hours, temps, icons)
     }
 
     fun getWeatherIcon(weatherCode: Int, isDay: Boolean): Int {

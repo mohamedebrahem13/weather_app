@@ -26,27 +26,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.weather_app.R
-import com.weather_app.domain.models.DailyWeatherResponse
-import com.weather_app.ui.viewmodel.WeatherViewModel
 
 @Composable
 fun WeeklyForecastCard(
-    dailyWeather: DailyWeatherResponse, viewModel: WeatherViewModel
+    dates: List<String>,
+    weatherCodes: List<Int>,
+    minTemps: List<Double>,
+    maxTemps: List<Double>,
+    getDayName: (String) -> String,
+    getDayWeatherIcon: (Int) -> Int
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = 12.dp, vertical = 0.dp)
             .padding(bottom = 32.dp)
             .clip(RoundedCornerShape(24.dp))
             .border(
                 1.dp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f),
-                RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp)
             )
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
     ) {
-        dailyWeather.daily.time.take(7).forEachIndexed { index, date ->
+        dates.take(7).forEachIndexed { index, date ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -56,18 +59,19 @@ fun WeeklyForecastCard(
                     modifier = Modifier
                         .width(120.dp)
                         .padding(top = 22.dp, bottom = 21.dp, end = 9.5.dp, start = 16.dp),
-                    text = viewModel.getDayName(date),
+                    text = getDayName(date),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
 
                 Image(
-                    painter = painterResource(viewModel.getDayWeatherIcon(dailyWeather.daily.weatherCode[index])),
+                    painter = painterResource(getDayWeatherIcon(weatherCodes[index])),
                     contentDescription = stringResource(R.string.weather_icon),
                     modifier = Modifier
                         .size(91.dp, 45.dp)
                         .padding(end = 9.5.dp, bottom = 8.dp, top = 8.dp)
                 )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -77,14 +81,12 @@ fun WeeklyForecastCard(
                         contentDescription = stringResource(R.string.high_temperature),
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
-
                     )
 
                     Spacer(modifier = Modifier.width(2.5.dp))
 
-
                     Text(
-                        text = "${dailyWeather.daily.temperature2mMax[index]}°C",
+                        text = "${maxTemps[index]}°C",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
                     )
@@ -103,7 +105,7 @@ fun WeeklyForecastCard(
 
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_down_04),
-                        contentDescription = "Low Temperature",
+                        contentDescription = stringResource(R.string.low_temperature),
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
                     )
@@ -111,17 +113,15 @@ fun WeeklyForecastCard(
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = "${dailyWeather.daily.temperature2mMin[index]}°C",
+                        text = "${minTemps[index]}°C",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f),
                         modifier = Modifier.padding(end = 12.dp)
-
                     )
                 }
-
             }
 
-            if (index < 6) {
+            if (index < dates.size - 1) {
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     thickness = 1.dp,

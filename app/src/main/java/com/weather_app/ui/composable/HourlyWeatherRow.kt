@@ -22,29 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.weather_app.domain.models.HourlyWeather
-import com.weather_app.ui.viewmodel.WeatherViewModel
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Composable
-fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean, viewModel: WeatherViewModel) {
-    val times = hourlyWeather.hourly.time
-    val temps = hourlyWeather.hourly.temperature2m
-    val weatherCodes = hourlyWeather.hourly.weatherCode
-
-    val today = LocalDate.now()
-    DateTimeFormatter.ISO_LOCAL_DATE
-
-    val filteredData = times.mapIndexedNotNull { index, timeStr ->
-        val dateTime = LocalDateTime.parse(timeStr)
-        if (dateTime.toLocalDate() == today) {
-            Triple(dateTime, temps[index], weatherCodes[index])
-        } else {
-            null
-        }
-    }
+fun HourlyWeatherRow(
+    hours: List<String>,
+    temperatures: List<String>,
+    weatherIconResIds: List<Int>
+) {
+    val itemCount = listOf(hours.size, temperatures.size, weatherIconResIds.size).min()
 
     LazyRow(
         modifier = Modifier
@@ -53,8 +38,7 @@ fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean, viewModel: We
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp)
     ) {
-        items(filteredData.size) { index ->
-            val (dateTime, temp, weatherCode) = filteredData[index]
+        items(itemCount) { index ->
             Box(modifier = Modifier.wrapContentSize()) {
                 Column(
                     modifier = Modifier
@@ -74,19 +58,20 @@ fun HourlyWeatherRow(hourlyWeather: HourlyWeather, isDay: Boolean, viewModel: We
                             start = 26.dp,
                             end = 25.dp
                         ),
-                        text = "$temp°C",
+                        text = "${temperatures[index]}°C",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.87f)
                     )
                     Text(
                         modifier = Modifier.padding(bottom = 20.dp),
-                        text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        text = hours[index],
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                 }
+
                 Image(
-                    painter = painterResource(viewModel.getWeatherIcon(weatherCode, isDay = isDay)),
+                    painter = painterResource(id = weatherIconResIds[index]),
                     contentDescription = "Weather Icon",
                     modifier = Modifier
                         .size(width = 63.99.dp, height = 58.dp)

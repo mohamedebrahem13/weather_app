@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import com.weather_app.R
 import com.weather_app.domain.models.HourlyWeather
 import com.weather_app.ui.viewmodel.WeatherViewModel
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun WeatherHeaderContainer(
@@ -55,11 +57,24 @@ fun WeatherHeaderContainer(
             )
         }
 
+        val currentTime = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:00"))
+        val currentIndex = hourlyWeather.hourly.time.indexOfFirst { it == currentTime }
+
+        val temperature = hourlyWeather.hourly.temperature2m.getOrElse(currentIndex) { "--" }.toString()
+        val weatherCode = hourlyWeather.hourly.weatherCode.getOrElse(currentIndex) { 0 }
+        val weatherIcon = viewModel.getWeatherIcon(weatherCode, isDay)
+        val maxTemperature = hourlyWeather.hourly.temperature2m.maxOrNull()?.toString() ?: "--"
+        val minTemperature = hourlyWeather.hourly.temperature2m.minOrNull()?.toString() ?: "--"
+        val condition = viewModel.getWeatherCondition(weatherCode)
+
         CollapsingWeatherContent(
-            isDay = isDay,
-            hourlyWeather = hourlyWeather,
+            temperature = temperature,
+            weatherIcon = weatherIcon,
+            maxTemperature = maxTemperature,
+            minTemperature = minTemperature,
             scrollOffset = scrollOffset,
-            viewModel=viewModel
+            weatherCondition = condition
         )
     }
 }

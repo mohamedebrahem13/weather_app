@@ -108,19 +108,39 @@ fun WeatherContent(
             minOf(1f, scrollState.firstVisibleItemScrollOffset / 300f)
         }
     }
+
+    val dates = dailyWeather.daily.time
+    val weatherCodes = dailyWeather.daily.weatherCode
+    val minTemps = dailyWeather.daily.temperature2mMin
+    val maxTemps = dailyWeather.daily.temperature2mMax
+
+    val (hours, temperatures, iconResIds) = viewModel.getTodayHourlyUiData(
+        hourlyWeather = hourlyWeather,
+        isDay = currentWeather.isDay
+    )
+
     LazyColumn(state = scrollState) {
         item {
             WeatherHeaderContainer(
-                currentWeather.isDay,
+                isDay = currentWeather.isDay,
                 hourlyWeather = hourlyWeather,
                 city = city,
-                scrollOffset,
-                viewModel
+                scrollOffset = scrollOffset,
+                viewModel = viewModel
             )
         }
+
         item {
-            WeatherMetricsSection(currentWeather,hourlyWeather)
+            WeatherMetricsSection(
+                windSpeed = currentWeather.windSpeed,
+                humidity = currentWeather.humidity,
+                rain = currentWeather.rain,
+                uvIndex = hourlyWeather.hourly.uvIndex[0],
+                pressure = currentWeather.surfacePressure,
+                feelsLike = currentWeather.apparentTemperature
+            )
         }
+
         item {
             Text(
                 text = stringResource(R.string.today),
@@ -130,7 +150,13 @@ fun WeatherContent(
             )
         }
 
-        item { HourlyWeatherRow(hourlyWeather = hourlyWeather, currentWeather.isDay, viewModel) }
+        item {
+            HourlyWeatherRow(
+                hours = hours,
+                temperatures = temperatures,
+                weatherIconResIds = iconResIds
+            )
+        }
 
         item {
             Text(
@@ -143,8 +169,15 @@ fun WeatherContent(
 
         item {
             Spacer(modifier = Modifier.height(12.dp))
-            WeeklyForecastCard(viewModel = viewModel, dailyWeather = dailyWeather)
+
+            WeeklyForecastCard(
+                dates = dates,
+                weatherCodes = weatherCodes,
+                minTemps = minTemps,
+                maxTemps = maxTemps,
+                getDayName = viewModel::getDayName,
+                getDayWeatherIcon = viewModel::getDayWeatherIcon
+            )
         }
     }
 }
-
