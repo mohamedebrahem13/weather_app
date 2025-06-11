@@ -1,6 +1,7 @@
 package com.weather_app.domain.interactor
 
-import com.weather_app.common.data.Resource
+import com.weather_app.common.domain.Resource
+import com.weather_app.common.domain.WeatherDomainException
 import com.weather_app.domain.models.CurrentWeather
 import com.weather_app.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -14,8 +15,10 @@ class GetCurrentWeatherUseCase(
         try {
             val currentWeather = repository.getCurrentWeather()
             emit(Resource.Success(currentWeather))
+        } catch (e: WeatherDomainException) {
+            emit(Resource.Failure(e))
         } catch (e: Exception) {
-            emit(Resource.Failure(Exception("Failed to fetch current weather data: ${e.message}", e)))
+            emit(Resource.Failure(WeatherDomainException.GenericError(e.message)))
         }
     }
 }

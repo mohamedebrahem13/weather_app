@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import com.google.android.gms.location.LocationServices
+import com.weather_app.common.data.WeatherDataException
 import com.weather_app.data.models.dto.LocationDto
 import com.weather_app.domain.repository.location.LocationProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -19,13 +20,13 @@ class FusedLocationProviderImpl(
     private val geocoder = Geocoder(context, Locale.getDefault())
 
     @SuppressLint("MissingPermission")
-    override suspend fun getCurrentLocation(): LocationDto? = suspendCancellableCoroutine { cont ->
-
+    override suspend fun getCurrentLocation(): LocationDto = suspendCancellableCoroutine { cont ->
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {
                     try {
-                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        val addresses =
+                            geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         val city = addresses?.firstOrNull()?.locality.orEmpty()
                         val country = addresses?.firstOrNull()?.countryName.orEmpty()
 
@@ -38,7 +39,7 @@ class FusedLocationProviderImpl(
                             )
                         )
                     } catch (e: Exception) {
-
+                        // Fall back if geocoder fails
                         cont.resume(
                             LocationDto(
                                 latitude = location.latitude,
@@ -49,11 +50,13 @@ class FusedLocationProviderImpl(
                         )
                     }
                 } else {
-                    cont.resume(null)
+                    cont.resumeWithException(WeatherDataException.Location.Unavailable)
                 }
             }
             .addOnFailureListener { exception ->
-                cont.resumeWithException(exception)
+                cont.resumeWithException(
+                    WeatherDataException.Location.Unavailable
+                )
             }
     }
 }

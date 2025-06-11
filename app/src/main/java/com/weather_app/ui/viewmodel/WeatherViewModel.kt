@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.weather_app.R
-import com.weather_app.common.data.Resource
+import com.weather_app.common.domain.Resource
 import com.weather_app.domain.interactor.GetCurrentWeatherUseCase
 import com.weather_app.domain.interactor.GetDailyWeatherUseCase
 import com.weather_app.domain.interactor.GetHourlyWeatherUseCase
