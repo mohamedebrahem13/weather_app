@@ -1,1 +1,59 @@
-/build
+# ========== Android/IntelliJ specific ==========
+.idea/
+*.iml
+*.ipr
+*.iws
+.gradle/
+local.properties
+
+# Build output
+/build/
+**/build/
+.cxx/
+.externalNativeBuild/
+navigation.json
+output.json
+
+# KAPT and Kotlin
+kaptGenerated/
+.kapt/
+*.kotlin_module
+
+# Generated files
+generated/
+gen/
+bin/
+tmp/
+
+# Android Studio miscellaneous
+captures/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.lock
+.DS_Store
+
+# Test reports
+test-results/
+reports/
+
+# Artifacts
+*.apk
+*.ap_
+*.aab
+
+# Keystore files (DO NOT COMMIT)
+*.jks
+*.keystore
+
+# Crashlytics and Fabric
+crashlytics-build.properties
+fabric.properties
+
+# Gradle local settings (optional)
+gradle.properties
+gradle-wrapper.properties
